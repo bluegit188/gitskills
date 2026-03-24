@@ -3,9 +3,7 @@
 use strict;
 
 ($#ARGV+2) >=2 || die 
-"Usage: mygetcols.pl n1 n2 n3 5:7 20:30:2 ...
-       5:7 will produce 5 6 7
-       20:30:2 will produce 20 22 24 26 28 30 in step=2\n";
+"Usage: myrmcols.pl n1 n2 n3 5:7 ...\n";
 
 
 
@@ -20,17 +18,9 @@ foreach my $i (0..$#ARGV)
   {
     push(@n,$str);         # the n's
   }
-  elsif($#tokens==1)
+  else
   {
      foreach my $k ( ($tokens[0])..($tokens[1]))
-     {
-       push(@n,$k);
-     }
-  }
-  else # with step specified
-  {
-     my $step=$tokens[2];
-     for (my $k= $tokens[0];$k<=$tokens[1];$k+=$step)
      {
        push(@n,$k);
      }
@@ -39,20 +29,43 @@ foreach my $i (0..$#ARGV)
 
 #print join(" ", @n), "\n";
 
+#build a hash from the array
+my %hash;
+foreach (@n)
+{
+    $hash{$_} = 1;
+};
 
 
-my @line; 
+
+my @line;
+my @n2; # the cols to keep
+my $count=0;
 while(<STDIN>)
 {
+    $count++;
     #chomp the new line at the end
     chomp($_);
     @line =split;
 
+    if($count==1)
+    {
+         foreach my $j (1..$#line+1)
+	 {
+	   if( ! exists $hash{$j})
+	   {
+	     push(@n2,$j);
+	   }
+	 }
+
+	 #print join(" ", @n2), "\n";
+    }
+
     my $str;
 
-    foreach my $j (0..$#n)
+    foreach my $j (0..$#n2)
     {
-        my $k=$n[$j];
+        my $k=$n2[$j];
         #print "k=$k\n";
         my $thisStr=$line[$k-1];
         $str=$str."$thisStr ";

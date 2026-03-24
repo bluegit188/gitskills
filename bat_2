@@ -1,0 +1,164 @@
+
+--oogap bench:
+
+
+fast fvoo
+WFD=30Y
+DOW=1.5
+WGT=0.81
+B=5
+bondWgt=1.0
+GAP=8.0
+
+cp /home/jgeng/notebooks/oogap_fcsts/config_oogap.yaml .
+cp /home/jgeng/notebooks/oogap_fcsts/tw.py .
+cp /home/jgeng/notebooks/junfei_lib/base/daily_rth.py .
+
+
+-- fcsts:
+
+cat ../[A-Z]*.txt|head -1 >h
+cat ../[A-Z]*.txt|egrep -v DATE >b
+cat h b >fcsts_scd_bench.txt
+
+
+--add yvars:
+
+cp /home/jgeng/bin/Macros/YVARS_202510/yvar_F5Ds_FOC_FGAPs.txt.all yvars.txt
+combine_match2.pl yvars.txt fcsts_scd_bench.txt |myrmcols.pl 10 11 >Y_X.txt
+
+#corrs (already post-2014)
+ get_corr_matrix_R.pl Y_X.txt  1 >aa
+more tmp_correlation.txt |mygetcols.pl 1 3 8 9 4:7|myFormatAuto.pl 1
+
+  colNames   ooF1D     FOC    FGAP   ooF2D   ooF3D   ooF4D   ooF5D
+       DATE -0.0036 -0.0024 -0.0027 -0.0055  -0.007 -0.0084 -0.0097
+      ooF1D       1   0.787  0.6058  0.7019  0.5742  0.5014  0.4457
+      ooF2D  0.7019  0.5496  0.4289       1  0.8123  0.7057  0.6328
+      ooF3D  0.5742   0.445  0.3568  0.8123       1  0.8632  0.7733
+      ooF4D  0.5014  0.3872  0.3132  0.7057  0.8632       1  0.8921
+      ooF5D  0.4457  0.3434  0.2795  0.6328  0.7733  0.8921       1
+        FOC   0.787       1 -0.0142  0.5496   0.445  0.3872  0.3434
+       FGAP  0.6058 -0.0142       1  0.4289  0.3568  0.3132  0.2795
+ ooF1D_mean  0.0245  0.0304   6e-04  0.0204  0.0139  0.0138  0.0112
+   FOC_mean  0.0222  0.0314 -0.0045   0.019  0.0134  0.0121  0.0089
+  FGAP_mean  0.0137  0.0084  0.0115  0.0103   0.006  0.0085   0.009
+ ooFD2_mean   0.016  0.0188  0.0017  0.0204  0.0178  0.0143  0.0113
+ ooF2D_mean  0.0255  0.0311  0.0013  0.0247  0.0187  0.0169  0.0136
+ ooF3D_mean   0.025  0.0294  0.0026  0.0239  0.0199  0.0183  0.0144
+  ooF1D_std -0.0069 -0.0203  0.0149 -0.0121  -0.011 -0.0115 -0.0133
+    FOC_std -0.0075 -0.0185  0.0117 -0.0109 -0.0121 -0.0151 -0.0163
+   FGAP_std -0.0044 -0.0127  0.0093 -0.0104 -0.0078 -0.0065 -0.0074
+  ooFD2_std -0.0023 -0.0142  0.0147 -0.0039 -0.0042 -0.0053 -0.0048
+  ooF2D_std -0.0014 -0.0152  0.0172 -0.0078 -0.0084 -0.0104 -0.0127
+  ooF3D_std -0.0042 -0.0152  0.0128 -0.0075 -0.0086 -0.0132 -0.0159
+
+
+
+
+--full period
+#TEST33
+
+plot_cummulative_pnls_demean.pl Y_X.txt 20140101 20231018 2 1 3 10 -0.13:0.13 0 1 AB all >perf.txt.ooF1D.scdFcst
+
+plot_cummulative_pnls_demean.pl Y_X.txt 20140101 20231018 2 1 8 11 -0.13:0.13 0 1 AB all >perf.txt.FOC.scdFcst
+
+plot_cummulative_pnls_demean.pl Y_X.txt 20140101 20231018 2 1 9 12 -0.13:0.13 0 1 AB all >perf.txt.FGAP.scdFcst
+
+
+
+--scdFcst (matching BLW period)
+# TEST3
+plot_cummulative_pnls_demean.pl Y_X.txt 20200101 20231018 2 1 3 10 -0.13:0.13 0 1 AB ES
+
+    20200101-20231018
+     #BLW
+     corr   rshp
+ES   0.033  0.47
+VX   0.0076 0.05
+
+     #Now:(TEST3)
+     corr     rshp
+ES   0.0117   0.19
+VX   -0.02   -0.1 # not good adding isBond, just remove it.
+
+     #Now:(TEST2)
+     corr     rshp
+ES   0.0146   0.24
+VX   -0.0162 -0.05 # after 2020 drawdown, the VX rebound is better than BLW thoug
+
+     #Now:(TEST1)
+     corr     rshp
+ES   0.0097   0.18
+VX   -0.038  -0.36 # after 2020 drawdown, VX has no rebound
+
+#LT
+plot_cummulative_pnls_demean.pl Y_X.txt 20140101 20231018 2 1 3 10 -0.13:0.13 0 1 AB ES
+
+
+ --check ES:
+corr=0.0097 but lbox2 live scd has cor=0.03320 for the same period, check why?
+
+wc tmp_y_x.txt
+  982  4910 41524 tmp_y_x.txt
+wc tmp_y_x.txt.lbox2 
+  982  4910 41723 tmp_y_x.txt.lbox2
+combine_match1.pl tmp_y_x.txt tmp_y_x.txt.lbox2 |mygetcols.pl 1 2 3 4 8 9|fgrep -v DATE|myAddHeader.sh "DATE SYM ooF1D ooF1D_mean ooF1D.lbox2 scdFcst.lbox2" >compare_scd_ES.txt
+get_corr_matrix_R.pl compare_scd_ES.txt 1
+
+> cor
+                      DATE       ooF1D  ooF1D_mean ooF1D.lbox2 scdFcst.lbox2
+DATE           1.000000000 -0.01457685 -0.06704687 -0.01457685  -0.006207494
+ooF1D         -0.014576848  1.00000000  0.01051633  1.00000000   0.032398635
+ooF1D_mean    -0.067046867  0.01051633  1.00000000  0.01051633   0.802130856
+ooF1D.lbox2   -0.014576848  1.00000000  0.01051633  1.00000000   0.032398635
+scdFcst.lbox2 -0.006207494  0.03239864  0.80213086  0.03239864   1.000000000
+
+==> fcst corr is only 80% !
+
+Is it due to VX, or due to pre-2015 univ?
+
+I'll rerun with VX removed from temp DB.
+
+getstats_fast.pl compare_scd_ES.txt 1|myFormatAuto.pl 1
+       colName              min              max             mean           std count
+          DATE 20200102.0000000 20231018.0000000 20214834.5484200 10889.7734464   981
+           SYM        0.0000000        0.0000000        0.0000000     0.0000000   981
+         ooF1D       -6.3967490        3.7091790        0.0158123     1.0953117   981
+    ooF1D_mean       -0.1300000        0.1300000        0.0200502     0.0399348   981
+   ooF1D.lbox2       -6.3967490        3.7091790        0.0158123     1.0953117   981
+ scdFcst.lbox2       -0.1200000        0.1300000        0.0187345     0.0446714   981
+
+
+
+--check combine ES and VX fcsts:
+#x vars
+combine_match1.pl ../ES.txt  ../VX.txt |mygetcols.pl 1 2 3 17|fgrep -v DATE|myAddHeader.sh "DATE SYM ooF1D_mean.ES ooF1D_mean.VX" >a1
+ more a1|gawk '{print $0, ($2+(-$3))/2}'|fgrep -v DATE|myAddHeader.sh "DATE SYM ooF1D_mean.ES ooF1D_mean.VX ooF1D_mean.AVG" >a2
+#ys
+cat yvars.txt |egrep -E -e"DATE| ES "|mygetcols.pl 1 2 3 8 9|fgrep -v DATE|myAddHeader.sh "DATE SYM ooF1D.ES FOC.ES FGAP.ES" >y1
+cat yvars.txt |egrep -E -e"DATE| VX "|mygetcols.pl 1 2 3 8 9|fgrep -v DATE|myAddHeader.sh "DATE SYM ooF1D.VX FOC.ES FGAP.VX" >y2
+combine_match1.pl y1 y2 >a3
+#combine
+combine_match1.pl a2 a3|myrmcols.pl 6 7 >combine_ES_VX_fcsts.txt
+get_corr_matrix_R.pl combine_ES_VX_fcsts.txt 1
+more tmp_correlation.txt |myFormatAuto.pl 1
+
+       colNames    DATE ooF1D_mean.ES ooF1D_mean.VX ooF1D_mean.AVG ooF1D.ES  FOC.ES FGAP.ES  DATE.1 ooF1D.VX FOC.ES.1 FGAP.VX
+           DATE       1        0.0053        -0.014        -0.0053  -0.0059  0.0053 -0.0169       1  -0.0095  -0.0231  0.0199
+  ooF1D_mean.ES  0.0053             1       -0.5272             -1   0.0372  0.0328  0.0178  0.0053  -0.0523  -0.0426 -0.0183
+  ooF1D_mean.VX  -0.014       -0.5272             1         0.5272   -0.022  -3e-04 -0.0361  -0.014    3e-04  -0.0315  0.0479
+ ooF1D_mean.AVG -0.0053            -1        0.5272              1  -0.0372 -0.0328 -0.0178 -0.0053   0.0523   0.0426  0.0183
+       ooF1D.ES -0.0059        0.0372        -0.022        -0.0372        1  0.7981  0.5912 -0.0059  -0.8089  -0.5841  -0.395
+         FOC.ES  0.0053        0.0328        -3e-04        -0.0328   0.7981       1 -0.0142  0.0053   -0.603  -0.7067  0.1149
+        FGAP.ES -0.0169        0.0178       -0.0361        -0.0178   0.5912 -0.0142       1 -0.0169  -0.5352  -0.0234 -0.8093
+         DATE.1       1        0.0053        -0.014        -0.0053  -0.0059  0.0053 -0.0169       1  -0.0095  -0.0231  0.0199
+       ooF1D.VX -0.0095       -0.0523         3e-04         0.0523  -0.8088  -0.603 -0.5352 -0.0095        1   0.7911  0.3843
+       FOC.ES.1 -0.0231       -0.0426       -0.0315         0.0426  -0.5841 -0.7067 -0.0234 -0.0231   0.7911        1 -0.2608
+        FGAP.VX  0.0199       -0.0183        0.0479         0.0183   -0.395  0.1149 -0.8093  0.0199   0.3843  -0.2608       1
+
+==>
+#ES and VX ooF1Ds are 80% correlated, fcsts are 53% correlated.
+#ES fcst is ok for prediction(3.7%), but VX fcst is almost 0% prediction VX
+# ES fcst good for VX as well.
+# combining ES and VX not better for ES, as VXFcst adds nothing
