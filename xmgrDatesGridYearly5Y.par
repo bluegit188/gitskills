@@ -1,0 +1,313 @@
+# Grace project file
+#
+version 50125
+page size 640, 480
+page scroll 5%
+page inout 5%
+link page off
+map font 13 to "ZapfDingbats", "ZapfDingbats"
+map font 4 to "Helvetica", "Helvetica"
+map font 6 to "Helvetica-Bold", "Helvetica-Bold"
+map font 5 to "Helvetica-Oblique", "Helvetica-Oblique"
+map font 7 to "Helvetica-BoldOblique", "Helvetica-BoldOblique"
+map font 17 to "Nimbus-Sans-L-Regular-Condensed", "Nimbus-Sans-L-Regular-Condensed"
+map font 18 to "Nimbus-Sans-L-Bold-Condensed", "Nimbus-Sans-L-Bold-Condensed"
+map font 19 to "Nimbus-Sans-L-Regular-Condensed-Italic", "Nimbus-Sans-L-Regular-Condensed-Italic"
+map font 20 to "Nimbus-Sans-L-Bold-Condensed-Italic", "Nimbus-Sans-L-Bold-Condensed-Italic"
+map font 0 to "Times-Roman", "Times-Roman"
+map font 2 to "Times-Bold", "Times-Bold"
+map font 1 to "Times-Italic", "Times-Italic"
+map font 3 to "Times-BoldItalic", "Times-BoldItalic"
+map font 8 to "Courier", "Courier"
+map font 10 to "Courier-Bold", "Courier-Bold"
+map font 9 to "Courier-Oblique", "Courier-Oblique"
+map font 11 to "Courier-BoldOblique", "Courier-BoldOblique"
+map font 29 to "URW-Palladio-L-Roman", "URW-Palladio-L-Roman"
+map font 30 to "URW-Palladio-L-Bold", "URW-Palladio-L-Bold"
+map font 31 to "URW-Palladio-L-Italic", "URW-Palladio-L-Italic"
+map font 32 to "URW-Palladio-L-Bold-Italic", "URW-Palladio-L-Bold-Italic"
+map font 12 to "Symbol", "Symbol"
+map font 34 to "URW-Chancery-L-Medium-Italic", "URW-Chancery-L-Medium-Italic"
+map color 0 to (255, 255, 255), "white"
+map color 1 to (0, 0, 0), "black"
+map color 2 to (255, 0, 0), "red"
+map color 3 to (0, 255, 0), "green"
+map color 4 to (0, 0, 255), "blue"
+map color 5 to (255, 255, 0), "yellow"
+map color 6 to (188, 143, 143), "brown"
+map color 7 to (220, 220, 220), "grey"
+map color 8 to (148, 0, 211), "violet"
+map color 9 to (0, 255, 255), "cyan"
+map color 10 to (255, 0, 255), "magenta"
+map color 11 to (255, 165, 0), "orange"
+map color 12 to (114, 33, 188), "indigo"
+map color 13 to (103, 7, 72), "maroon"
+map color 14 to (64, 224, 208), "turquoise"
+map color 15 to (0, 139, 0), "green4"
+reference date 0
+date wrap off
+date wrap year 1950
+default linewidth 1.0
+default linestyle 1
+default color 1
+default pattern 1
+default font 0
+default char size 1.000000
+default symbol size 1.000000
+default sformat "%.8g"
+background color 0
+page background fill on
+timestamp on
+timestamp 0.03, 0.03
+timestamp color 1
+timestamp rot 0
+timestamp font 0
+timestamp char size 1.000000
+timestamp def "Fri Dec 12 23:31:11 2025"
+r0 off
+link r0 to g0
+r0 type above
+r0 linestyle 1
+r0 linewidth 1.0
+r0 color 1
+r0 line 0, 0, 0, 0
+r1 off
+link r1 to g0
+r1 type above
+r1 linestyle 1
+r1 linewidth 1.0
+r1 color 1
+r1 line 0, 0, 0, 0
+r2 off
+link r2 to g0
+r2 type above
+r2 linestyle 1
+r2 linewidth 1.0
+r2 color 1
+r2 line 0, 0, 0, 0
+r3 off
+link r3 to g0
+r3 type above
+r3 linestyle 1
+r3 linewidth 1.0
+r3 color 1
+r3 line 0, 0, 0, 0
+r4 off
+link r4 to g0
+r4 type above
+r4 linestyle 1
+r4 linewidth 1.0
+r4 color 1
+r4 line 0, 0, 0, 0
+g0 on
+g0 hidden false
+g0 type XY
+g0 stacked false
+g0 bar hgap 0.000000
+g0 fixedpoint off
+g0 fixedpoint type 0
+g0 fixedpoint xy 0.000000, 0.000000
+g0 fixedpoint format general general
+g0 fixedpoint prec 6, 6
+with g0
+    world 2444239.5, -2.22767857143, 2461041.5, 11.0558035714
+    stack world 0, 0, 0, 0
+    znorm 1
+    view 0.150000, 0.150000, 1.150000, 0.850000
+    title ""
+    title font 0
+    title size 1.500000
+    title color 1
+    subtitle ""
+    subtitle font 0
+    subtitle size 1.000000
+    subtitle color 1
+    xaxes scale Normal
+    yaxes scale Normal
+    xaxes invert off
+    yaxes invert off
+    xaxis  on
+    xaxis  type zero false
+    xaxis  offset 0.000000 , 0.000000
+    xaxis  bar on
+    xaxis  bar color 1
+    xaxis  bar linestyle 1
+    xaxis  bar linewidth 1.0
+    xaxis  label ""
+    xaxis  label layout para
+    xaxis  label place auto
+    xaxis  label char size 1.000000
+    xaxis  label font 0
+    xaxis  label color 1
+    xaxis  label place normal
+    xaxis  tick on
+    xaxis  tick major 500
+    xaxis  tick minor ticks 1
+    xaxis  tick default 6
+    xaxis  tick place rounded true
+    xaxis  tick in
+    xaxis  tick major size 1.000000
+    xaxis  tick major color 4
+    xaxis  tick major linewidth 1.0
+    xaxis  tick major linestyle 1
+    xaxis  tick major grid on
+    xaxis  tick minor color 4
+    xaxis  tick minor linewidth 1.0
+    xaxis  tick minor linestyle 2
+    xaxis  tick minor grid on
+    xaxis  tick minor size 0.500000
+    xaxis  ticklabel on
+    xaxis  ticklabel format yymmdd
+    xaxis  ticklabel prec 5
+    xaxis  ticklabel formula ""
+    xaxis  ticklabel append ""
+    xaxis  ticklabel prepend ""
+    xaxis  ticklabel angle 0
+    xaxis  ticklabel skip 0
+    xaxis  ticklabel stagger 0
+    xaxis  ticklabel place normal
+    xaxis  ticklabel offset auto
+    xaxis  ticklabel offset 0.000000 , 0.010000
+    xaxis  ticklabel start type auto
+    xaxis  ticklabel start 0.000000
+    xaxis  ticklabel stop type auto
+    xaxis  ticklabel stop 0.000000
+    xaxis  ticklabel char size 1.000000
+    xaxis  ticklabel font 0
+    xaxis  ticklabel color 1
+    xaxis  tick place both
+    xaxis  tick spec type both
+    xaxis  tick spec 47
+    xaxis  tick major 0, 2444239.5
+    xaxis  ticklabel 0, "1980"
+    xaxis  tick minor 1, 2444605.5
+    xaxis  tick minor 2, 2444970.5
+    xaxis  tick minor 3, 2445335.5
+    xaxis  tick minor 4, 2445700.5
+    xaxis  tick major 5, 2446066.5
+    xaxis  ticklabel 5, "1985"
+    xaxis  tick minor 6, 2446431.5
+    xaxis  tick minor 7, 2446796.5
+    xaxis  tick minor 8, 2447161.5
+    xaxis  tick minor 9, 2447527.5
+    xaxis  tick major 10, 2447892.5
+    xaxis  ticklabel 10, "1990"
+    xaxis  tick minor 11, 2448257.5
+    xaxis  tick minor 12, 2448622.5
+    xaxis  tick minor 13, 2448988.5
+    xaxis  tick minor 14, 2449353.5
+    xaxis  tick major 15, 2449718.5
+    xaxis  ticklabel 15, "1995"
+    xaxis  tick minor 16, 2450083.5
+    xaxis  tick minor 17, 2450449.5
+    xaxis  tick minor 18, 2450814.5
+    xaxis  tick minor 19, 2451179.5
+    xaxis  tick major 20, 2451544.5
+    xaxis  ticklabel 20, "2000"
+    xaxis  tick minor 21, 2451910.5
+    xaxis  tick minor 22, 2452275.5
+    xaxis  tick minor 23, 2452640.5
+    xaxis  tick minor 24, 2453005.5
+    xaxis  tick major 25, 2453371.5
+    xaxis  ticklabel 25, "2005"
+    xaxis  tick minor 26, 2453736.5
+    xaxis  tick minor 27, 2454101.5
+    xaxis  tick minor 28, 2454466.5
+    xaxis  tick minor 29, 2454832.5
+    xaxis  tick major 30, 2455197.5
+    xaxis  ticklabel 30, "2010"
+    xaxis  tick minor 31, 2455562.5
+    xaxis  tick minor 32, 2455927.5
+    xaxis  tick minor 33, 2456293.5
+    xaxis  tick minor 34, 2456658.5
+    xaxis  tick major 35, 2457023.5
+    xaxis  ticklabel 35, "2015"
+    xaxis  tick minor 36, 2457388.5
+    xaxis  tick minor 37, 2457754.5
+    xaxis  tick minor 38, 2458119.5
+    xaxis  tick minor 39, 2458484.5
+    xaxis  tick major 40, 2458849.5
+    xaxis  ticklabel 40, "2020"
+    xaxis  tick minor 41, 2459215.5
+    xaxis  tick minor 42, 2459580.5
+    xaxis  tick minor 43, 2459945.5
+    xaxis  tick minor 44, 2460310.5
+    xaxis  tick major 45, 2460676.5
+    xaxis  ticklabel 45, "2025"
+    xaxis  tick minor 46, 2461041.5
+    yaxis  on
+    yaxis  type zero false
+    yaxis  offset 0.000000 , 0.000000
+    yaxis  bar on
+    yaxis  bar color 1
+    yaxis  bar linestyle 1
+    yaxis  bar linewidth 1.0
+    yaxis  label ""
+    yaxis  label layout para
+    yaxis  label place auto
+    yaxis  label char size 1.000000
+    yaxis  label font 0
+    yaxis  label color 1
+    yaxis  label place normal
+    yaxis  tick on
+    yaxis  tick major 2
+    yaxis  tick minor ticks 1
+    yaxis  tick default 6
+    yaxis  tick place rounded true
+    yaxis  tick in
+    yaxis  tick major size 1.000000
+    yaxis  tick major color 4
+    yaxis  tick major linewidth 1.0
+    yaxis  tick major linestyle 1
+    yaxis  tick major grid on
+    yaxis  tick minor color 4
+    yaxis  tick minor linewidth 1.0
+    yaxis  tick minor linestyle 2
+    yaxis  tick minor grid on
+    yaxis  tick minor size 0.500000
+    yaxis  ticklabel on
+    yaxis  ticklabel format general
+    yaxis  ticklabel prec 5
+    yaxis  ticklabel formula ""
+    yaxis  ticklabel append ""
+    yaxis  ticklabel prepend ""
+    yaxis  ticklabel angle 0
+    yaxis  ticklabel skip 0
+    yaxis  ticklabel stagger 0
+    yaxis  ticklabel place normal
+    yaxis  ticklabel offset auto
+    yaxis  ticklabel offset 0.000000 , 0.010000
+    yaxis  ticklabel start type auto
+    yaxis  ticklabel start 0.000000
+    yaxis  ticklabel stop type auto
+    yaxis  ticklabel stop 0.000000
+    yaxis  ticklabel char size 1.000000
+    yaxis  ticklabel font 0
+    yaxis  ticklabel color 1
+    yaxis  tick place both
+    yaxis  tick spec type none
+    altxaxis  off
+    altyaxis  off
+    legend on
+    legend loctype view
+    legend 0.85, 0.8
+    legend box color 1
+    legend box pattern 1
+    legend box linewidth 1.0
+    legend box linestyle 1
+    legend box fill color 0
+    legend box fill pattern 1
+    legend font 0
+    legend char size 1.000000
+    legend color 1
+    legend length 4
+    legend vgap 1
+    legend hgap 1
+    legend invert false
+    frame type 0
+    frame linestyle 1
+    frame linewidth 1.0
+    frame color 1
+    frame pattern 1
+    frame background color 0
+    frame background pattern 0
