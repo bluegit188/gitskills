@@ -1,0 +1,32 @@
+TIMESTAMP OFF
+#read block data one at a time, s0,s1, ...
+read block "/tmp/forplot_ppl.txt.1"
+block xy "1:2"
+read block "/tmp/forplot_ppl.txt.2"
+block xy "1:2"
+#1=black, 2=red, 3=green, 4=blue, 8=purple
+s0 line color 1
+s1 line color 2
+s0 line linewidth 2
+s1 line linewidth 2
+s0 linestyle  1
+s1 linestyle  1
+# symbols
+#s0 symbol 1
+#s0 symbol size 0.5
+#s0 symbol fill 1
+s1 symbol 2
+s1 symbol size 0.1
+s1 symbol fill 1
+with g0
+s0 legend "gross"
+s1 legend "net"
+legend 0.25, 0.8
+yaxis label "cumPnl"
+yaxis label char size 1.25
+title "optZA: SYM gPcShp:nPcShp= GSHP : NSHP , pcSlip= PCSLIP"
+title size 1
+title color 1
+subtitle "gShp:nShp(P.A.)= GPORTSHP : NPORTSHP, sizeX/tcost=XXX:XXX"
+subtitle size 1.1
+xaxis  ticklabel format yymmdd
