@@ -1,1 +1,0 @@
-/usr/bin/xmgrace -fixed 640 480 -maxpath 1000000 -timestamp -param /home/jgeng/bar.par $*
