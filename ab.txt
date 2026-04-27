@@ -1,0 +1,90 @@
+   def get_x_vec_63(self, rth, today_date: int) -> np.ndarray:
+        """
+        get query vec for scd fcst
+
+        Parameters
+        ----------
+        rth : DailyRTH
+            Object containing self.df with 'date' and 'ooP1D'.
+        today_date : pd.Timestamp
+            The current date for which to compute the query vector.
+
+        Returns
+        -------
+        np.ndarray
+            Vector of 21 cumulative OO sums scaled by 100.
+        """
+        #df = rth.df.sort_values("date").reset_index(drop=True)
+        df=rth.df
+        if today_date not in set(df["date"]):
+            raise ValueError(f"Date {today_date} not found in rth.df")
+
+        loc = df.index[df["date"] == today_date][0]
+        if loc < 63:
+            raise ValueError("Error: less than 63 days OOs to compute knn15 fcst")
+
+        # Take the past 42 ooP1D values (most recent first)
+        oo_values = df.loc[loc - 62:loc, "ooP1D"].iloc[::-1].to_numpy()
+
+        # Compute cumulative sums for 21 days
+        cum_sums = np.cumsum(oo_values)[:63]
+
+        # Optional sign flip logic (disabled by default)
+        is_flip = 0
+        # Example:
+        if rth.sym in ["VX"]:  #, "JY", "JYA"]:
+            is_flip = 1
+
+        C = 1#100.0
+        if is_flip:
+            x_vec = -cum_sums * C
+        else:
+            x_vec = cum_sums * C
+
+        return x_vec
+
+
+
+
+more config_scdtw.yaml
+#dfile: C:\Users\admin\notebooks\template_data\template_data_scd_20251009.txt
+dfile: /home/jgeng/notebooks/template_data_scd_60D/template_data_scd_60D_20251009.txt.fastfvoo
+NFold: 50
+distType: 4
+SCBand: 5
+Ks: 2500
+WFD: 1
+leakDist: 90
+colDate: 2
+colSym: 1
+colYNames: [ooF1D, FOC, FGAP, ooFD2, ooF2D, ooF3D,ooF5D,ooF10D,ooF15D]
+colXNames: [OO_1, OO_1t2, OO_1t3, OO_1t4, OO_1t5, OO_1t6, OO_1t7, OO_1t8, OO_1t9, OO_1t10, OO_1t11, OO_1t12, OO_1t13, OO_1t14, OO_1t15, OO_1t16, OO_1t17, OO_1t18
+, OO_1t19, OO_1t20, OO_1t21,OO_1t22, OO_1t23, OO_1t24, OO_1t25, OO_1t26, OO_1t27, OO_1t28, OO_1t29, OO_1t30, OO_1t31, OO_1t32, OO_1t33, OO_1t34, OO_1t35, OO_1t36
+, OO_1t37, OO_1t38, OO_1t39, OO_1t40, OO_1t41,OO_1t42, OO_1t43, OO_1t44, OO_1t45, OO_1t46, OO_1t47, OO_1t48, OO_1t49, OO_1t50, OO_1t51, OO_1t52, OO_1t53, OO_1t54
+, OO_1t55, OO_1t56, OO_1t57, OO_1t58, OO_1t59, OO_1t60, OO_1t61, OO_1t62, OO_1t63]
+wgts: [1,   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1,   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1,   1, 1, 1, 1, 1, 1, 1, 
+1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ]
+
+
+
+def load_cfile_and_DF_scd60(): #(ssetSession as)
+    #load config file
+    #config_file=rf"C:\Users\admin\notebooks\scdtw_fcsts\config_scdtw.yaml";
+    config_file=rf"/home/jgeng/notebooks/scdtw_fcsts_60D/config_scdtw.yaml";
+    cfg=Config(config_file)
+
+    #load template datafile
+    data_file = cfg.dfile
+    #print(data_file)
+    pl_df = pl.read_csv(data_file, has_header=True,separator=' ',try_parse_dates=False)
+    df = pl_df.to_pandas()
+    df = df[df["sym"] != "VX"].copy()  #remove VX
+
+    ### for scdFcst, need to add DOW and is_bond
+    df=dateint_to_dateiso(df,'date')
+    df = AS.merge_with(df,sym_col="sym") # add asset/session
+    df["is_bond"] = (df["ASSET4"] == "Financial").astype(int)
+    df["DOW"]= df["date_iso"].dt.dayofweek+1
+
+    return cfg,df
+
