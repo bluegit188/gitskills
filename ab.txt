@@ -1,3 +1,24 @@
+
+    @staticmethod
+    @njit
+    def compute_euc_dist_njit(query_vec, ref_vec):
+        """Compute vector-to-matrix distances."""
+        #dists = np.sum((ref_vec - query_vec) ** 2)
+        #return dists
+        # a simple loop inside numba is faster than np.sum((ref_vec - query_vec)**2)
+        # avoids temporary array allocation
+        n = query_vec.shape[0]
+        dist = 0.0
+        for i in range(n):
+            diff = ref_vec[i] - query_vec[i]
+            dist += diff * diff
+        return dist
+
+
+
+
+
+
    def get_x_vec_63(self, rth, today_date: int) -> np.ndarray:
         """
         get query vec for scd fcst
