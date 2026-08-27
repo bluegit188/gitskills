@@ -1,0 +1,475 @@
+#ifndef JUNFEI_KSVM_H
+#define JUNFEI_KSVM_H
+
+#include <vector>
+#include <string>
+#include <cmath>
+#include <map>
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <iostream>
+#include <cstdio>
+#include <cstdlib>
+#include <algorithm>
+#include <cassert>
+
+#include "DailyRTH.h"
+#include "AssetSession.h"
+
+#include <gsl/gsl_fit.h>
+#include <gsl/gsl_matrix.h>
+#include <gsl/gsl_vector.h>
+#include <gsl/gsl_multifit.h>
+#include <gsl/gsl_statistics.h>
+#include <gsl/gsl_blas.h>
+
+
+using namespace std;
+
+/* KSVM.h
+ *
+ * This class is to ...
+ * 
+ * @Junfei Geng, 20150910
+ * */
+
+
+
+class KSVM
+{
+  public:
+    KSVM();                             // constructor
+    ~KSVM();                            // destructor
+
+    KSVM(const string svmFile);
+
+    int  size() const{return mySize;}        // return size
+    void  print();
+    bool read(const string filename);
+
+    double computeFcst(DailyRTH& rth,int todayDate, AssetSession& as);
+
+    vector<double> getSVMXVec(DailyRTH& rth,int todayDate, AssetSession& a);
+
+
+  private:
+
+    int    mySize;                      // number of records
+    int    myNXvars;                    // number of xvars
+
+    double mySigma;                   
+    double myB;                         //intercept      
+
+
+    vector<string> mySyms;
+    vector<int> myDates;
+    vector<double> myCoefs;
+    vector<double> myXs;
+
+};
+
+#endif
+
+#include "KSVM.h"
+
+
+
+KSVM::KSVM()
+{
+    mySize=0;
+}
+
+KSVM::KSVM(const string svmFile)
+{
+   read(svmFile);
+}
+
+KSVM::~KSVM()
+{
+   // to do
+}
+
+
+bool KSVM::read(const string filename)
+{
+    ifstream input;
+    input.open(filename.c_str());
+    if(input.fail())
+    {
+        cerr << "Can't open the file: " << filename << endl;
+        exit(-1);
+    }
+
+    string sigmaStr,bStr;
+    input>>sigmaStr>>mySigma;
+    input>>bStr>>myB;
+
+    int date;
+    double coef,GAP,O1,H1,L1,C1,O2,H2,L2,C2,O3,H3,L3,C3,O4,H4,L4,C4,DOW, isPhy, isAmerica;
+    string sym;
+
+    myNXvars=18;
+
+    while(input>>sym>>date>>coef>>GAP>>O1>>H1>>L1>>C1>>O2>>H2>>L2>>C2>>O3>>H3>>L3>>C3>>O4>>H4>>L4>>C4>>DOW>>isPhy >> isAmerica)
+    {
+       
+         // put Y and Xs into sortage
+         mySyms.push_back(sym);
+         myDates.push_back(date);
+
+         myCoefs.push_back(coef);
+	 //add weights 
+	 myXs.push_back(2.0*GAP);
+	 myXs.push_back(O1);
+	 myXs.push_back(H1);
+	 myXs.push_back(L1);
+	 myXs.push_back(C1);
+	 myXs.push_back(O2);
+	 myXs.push_back(H2);
+	 myXs.push_back(L2);
+	 myXs.push_back(C2);
+	 myXs.push_back(O3);
+	 myXs.push_back(H3);
+	 myXs.push_back(L3);
+	 myXs.push_back(C3);
+	 myXs.push_back(O4);
+	 myXs.push_back(H4);
+	 myXs.push_back(L4);
+	 myXs.push_back(C4);
+	 myXs.push_back(0.5*DOW);
+	 myXs.push_back(0.5*isPhy);
+	 myXs.push_back(0.25*isAmerica);
+
+
+    }
+
+    input.close();
+
+    mySize=myCoefs.size();
+    return true;
+
+}
+
+void KSVM::print()
+{
+
+    for (int j = 0; j < mySize; j++)
+    {
+   
+        cout<<mySyms[j]<<" "<<myDates[j]<<" "<<myCoefs[j];
+	for (int i = 0; i < myNXvars; i++)
+	{  
+	  cout<<" "<< myXs[j*myNXvars+i];
+	}
+	cout<<endl;
+    }
+
+
+}
+
+double KSVM::computeFcst(DailyRTH& rth,int todayDate, AssetSession& as)
+//compute svm fcst
+{
+
+  vector<double> xVec=getSVMXVec(rth,todayDate,as);
+    //cout<<"xVec size="<<xVec.size()<<endl;
+    //print   
+    const char * a[]={"GAP*2","O1","H1","L1","C1","O2","H2","L2","C2","O3","H3","L3","C3","O4","H4","L4","C4","DOW/2","isPhy/2","isAmerica/4"};
+    vector<string>names(a, a+sizeof(a)/sizeof(a[0]));
+    
+
+
+    vector<double> xVec2=xVec; // for display
+   // flip VX rets back, no switch of H and L
+    if(as.getSymbol()=="VX")
+    {
+
+      xVec2[0]= -xVec2[0];
+
+      xVec2[1]= -xVec2[1];
+      xVec2[2]= -xVec2[2];
+      xVec2[3]= -xVec2[3];
+      xVec2[4]= -xVec2[4];
+
+
+      xVec2[5]= -xVec2[5];
+      xVec2[6]= -xVec2[6];
+      xVec2[7]= -xVec2[7];
+      xVec2[8]= -xVec2[8];
+
+
+      xVec2[9]= -xVec2[9];
+      xVec2[10]= -xVec2[10];
+      xVec2[11]= -xVec2[11];
+      xVec2[12]= -xVec2[12];
+
+      xVec2[13]= -xVec2[13];
+      xVec2[14]= -xVec2[14];
+      xVec2[15]= -xVec2[15];
+      xVec2[16]= -xVec2[16];
+
+    }
+
+    
+
+    cout<<"LOG: SVM xvar= "<<endl;
+    for(unsigned int i=0;i<xVec.size();i++)
+    {
+        cout<<"LOG:  "<<names[i]<<" "<<xVec2[i]<<endl;
+    }
+    //cout<<endl;
+  
+
+
+    gsl_matrix *x,*X, *c,*dotb;
+    gsl_matrix *I1,*I2, *I3,*I4,*eI4,*unit,*res;
+
+    int nSV = mySize; //# of SVs
+    int nXvar=20;
+
+    X = gsl_matrix_alloc (nSV, nXvar); //SVs
+    x = gsl_matrix_alloc (1, nXvar);   //1x18, input 
+    c = gsl_matrix_alloc (nSV, 1);     //coef or alphas
+    dotb = gsl_matrix_alloc (nSV, 1); 
+
+    I1 = gsl_matrix_alloc (1,nSV); 
+    I2 = gsl_matrix_alloc (1,nSV); 
+    I3 = gsl_matrix_alloc (1,nSV); 
+    I4 = gsl_matrix_alloc (1,nSV); 
+    eI4 = gsl_matrix_alloc (1,nSV); 
+
+    unit = gsl_matrix_alloc (nSV, 1); 
+    gsl_matrix_set_all (unit,1.0);
+
+    gsl_matrix_set_all (I4,0.0);
+
+    res = gsl_matrix_alloc (1, 1); 
+
+
+    //matrices init
+    double dota=0;
+    for (int i = 0; i < nXvar; i++)
+    { 
+        double v=xVec[i];
+        gsl_matrix_set (x, 0, i, v);  
+	dota+=v*v;
+    }
+
+
+    for (int j = 0; j < nSV; j++)
+    {
+        double rowSum=0;
+	for (int i = 0; i < nXvar; i++)
+	{  
+	    double v=myXs[j*nXvar+i];
+	    gsl_matrix_set (X, j, i, myXs[j*nXvar+i]);
+	    rowSum+=v*v;
+	}
+
+        gsl_matrix_set (c,j ,0, myCoefs[j]);
+	gsl_matrix_set (dotb,j ,0, rowSum);
+
+    }
+
+
+
+    //I4=I1+I2+I3, nSVx1 where
+    //I1=  2*x%*%t(X) 
+    //I2= -t(dotb)
+    //I3= - dota*t(rep.int(1,n2)) //dota is const 
+    //I4=(I1+I2+I3)
+    //eI4=exp(sigma*I4)
+   
+    //C =a*AB + C
+    gsl_blas_dgemm (CblasNoTrans, CblasTrans,2.0, x, X,0.0, I1);
+
+    gsl_matrix_transpose_memcpy (I2, dotb);
+    gsl_matrix_scale (I2, -1.0);
+
+    gsl_matrix_transpose_memcpy (I3, unit);
+    gsl_matrix_scale (I3, -dota);
+
+    gsl_matrix_add (I4, I1);
+    gsl_matrix_add (I4, I2);
+    gsl_matrix_add (I4, I3);
+  
+    //matrix exponential: 1x3206
+    for (int j = 0; j < nSV; j++)
+    {
+        double val=gsl_matrix_get(I4,0,j);
+        gsl_matrix_set (eI4,0,j,exp(mySigma*val));
+    }
+
+    /*
+    cout<<"I1,2,3,4,eI4"<<endl;
+    for (int j = 0; j < nSV; j++)
+    {
+      cout<<gsl_matrix_get(I1,0,j)<<" "
+	  <<gsl_matrix_get(I2,0,j)<<" "
+	  <<gsl_matrix_get(I3,0,j)<<" "
+	  <<gsl_matrix_get(I4,0,j)<<" "
+	  <<gsl_matrix_get(eI4,0,j)<<endl;
+    }
+    */
+
+
+    gsl_blas_dgemm (CblasNoTrans, CblasNoTrans,1.0, eI4, c,0.0, res);
+    double svmFcst=gsl_matrix_get(res,0,0)-myB;
+    //cout<<"final= "<<svmFcst<<" res="<<gsl_matrix_get(res,0,0)<<" B="<<myB<<endl;
+
+    double scale=6.202949;
+    double min=-3.137229;
+    svmFcst=svmFcst*scale+min; //scale back
+    //cout<<"final scl back="<<svmFcst<<endl;
+
+
+    gsl_matrix_free (X);
+    gsl_matrix_free (x);
+    gsl_matrix_free (c);
+    gsl_matrix_free (dotb);
+
+    gsl_matrix_free (I1);
+    gsl_matrix_free (I2);
+    gsl_matrix_free (I3);
+    gsl_matrix_free (I4);
+    gsl_matrix_free (eI4);
+    gsl_matrix_free (unit);
+
+
+    // flip VX fcst
+    if(as.getSymbol()=="VX")
+    {
+      return -svmFcst;
+    }
+
+
+    return svmFcst;
+
+}
+
+
+
+vector<double> KSVM::getSVMXVec( DailyRTH& rth,int todayDate, AssetSession& as)
+{
+
+    int loc=rth.findLocOfDate(todayDate);
+    if(loc<5)
+    {
+       cerr<<"Error: less than 5 days o/h/l/c to compute svm fcst"<<endl;
+       exit(1);
+    }
+
+    vector<double>xVec;
+    double GAP=rth.getGAP(loc);    
+    double O1=rth.getO(loc);    
+    double H1=rth.getH(loc);    
+    double L1=rth.getL(loc);    
+    double C1=rth.getC(loc);    
+    double O2=rth.getO(loc-1);    
+    double H2=rth.getH(loc-1);    
+    double L2=rth.getL(loc-1);    
+    double C2=rth.getC(loc-1);    
+    double O3=rth.getO(loc-2);    
+    double H3=rth.getH(loc-2);    
+    double L3=rth.getL(loc-2);    
+    double C3=rth.getC(loc-2);    
+    double O4=rth.getO(loc-3);    
+    double H4=rth.getH(loc-3);    
+    double L4=rth.getL(loc-3);    
+    double C4=rth.getC(loc-3);    
+    
+    int DOW=getDOW(todayDate);
+
+    int isPhy=as.isPhy();
+    int isAmerica=as.isAmerica();
+
+
+    if(GAP==NA_DBL 
+       ||O1==NA_DBL || H1==NA_DBL || L1==NA_DBL||C1==NA_DBL
+       ||O2==NA_DBL || H2==NA_DBL || L2==NA_DBL||C2==NA_DBL
+       ||O3==NA_DBL || H3==NA_DBL || L3==NA_DBL||C3==NA_DBL
+       ||O4==NA_DBL || H4==NA_DBL || L4==NA_DBL||C4==NA_DBL)
+    {
+       cerr<<"Error: One of the 4 O/H/L/C contains NA value"<<endl;
+       exit(1);
+    }
+
+
+
+    int isVX=0;
+    if(as.getSymbol()=="VX")
+    {
+      isVX=1;
+      isPhy=1;
+    }
+
+
+
+    if(isVX==0)
+    {
+
+    xVec.push_back(GAP*2.0);
+    xVec.push_back(O1);
+    xVec.push_back(H1);
+    xVec.push_back(L1);
+    xVec.push_back(C1);
+    xVec.push_back(O2);
+    xVec.push_back(H2);
+    xVec.push_back(L2);
+    xVec.push_back(C2);
+    xVec.push_back(O3);
+    xVec.push_back(H3);
+    xVec.push_back(L3);
+    xVec.push_back(C3);
+    xVec.push_back(O4);
+    xVec.push_back(H4);
+    xVec.push_back(L4);
+    xVec.push_back(C4);
+    }
+    else
+    {
+    xVec.push_back(-GAP*2.0);
+    xVec.push_back(-O1);
+    xVec.push_back(-H1);
+    xVec.push_back(-L1);
+    xVec.push_back(-C1);
+    xVec.push_back(-O2);
+    xVec.push_back(-H2);
+    xVec.push_back(-L2);
+    xVec.push_back(-C2);
+    xVec.push_back(-O3);
+    xVec.push_back(-H3);
+    xVec.push_back(-L3);
+    xVec.push_back(-C3);
+    xVec.push_back(-O4);
+    xVec.push_back(-H4);
+    xVec.push_back(-L4);
+    xVec.push_back(-C4);
+
+    }
+
+
+    xVec.push_back(DOW*0.5);
+
+    xVec.push_back(isPhy*0.5);
+    xVec.push_back(isAmerica*0.25);
+
+    /*
+    //print   
+    for(unsigned int i=0;i<xVec.size();i++)
+    {
+        cout<<i<<" "<<xVec[i]<<endl;
+    }
+    */
+
+    /*
+    cout<<"20150213="<<getDOW(20150213)<<endl;
+    cout<<"20150306="<<getDOW(20150306)<<endl;
+    cout<<"20000106="<<getDOW(20000106)<<endl;
+    cout<<"20000306="<<getDOW(20000306)<<endl;
+    cout<<"19950306="<<getDOW(19950306)<<endl;
+    */
+
+    return xVec;
+}
