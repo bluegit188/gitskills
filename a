@@ -1,0 +1,120 @@
+vector<double> KSVMD1::getSVMXVec( DailyRTH& rth,int todayDate, AssetSession& as,Dates & dater)
+{
+
+    int loc=rth.findLocOfDate(todayDate);
+    if(loc<42)
+    {
+       cerr<<"Error: less than 42 days data to compute svm fcst"<<endl;
+       exit(1);
+    }
+    //cout<<"loc= "<<loc<<endl;
+
+    // I(1*isPhy)+ I(2*GAP)+ I(8*OO.1)+I(4*OO.1t2N) + I(2*OO.1t6N1)+ I(1*OO.1t21N1)+I(1*DOW),
+
+    vector<double>xVec;
+    double GAP=rth.getGAP(loc);    
+
+    
+    int DOW=getDOW(todayDate);
+
+    int isPhy=as.isPhy();
+    //int isAmerica=as.isAmerica();
+
+
+    //compute OOs
+    vector<double> OOs;
+    for(unsigned int i=0;i<42;i++)
+    {
+        double x=rth.getOOP1D(loc-i);
+	//cout<<"i= "<<i<<" x= "<<x<<endl;
+	if(x==NA_DBL )
+        {
+	    cerr<<"Error: One of the OOs is NA"<<endl;
+	    exit(1);
+	}
+        OOs.push_back(x);
+    }
+
+
+
+    //# normalization scheme 1, by own std
+    //# usually, svm has no issues with correlated inputs
+    //regdata$OO.1t2N1= regdata$OO.1t2/1.39
+    //regdata$OO.1t6N1=regdata$OO.1t6/2.371653
+    //regdata$OO.1t21N1=regdata$OO.1t21/5
+     // I(1*isPhy)+ I(2*GAP)+ I(8*OO.1)+I(4*OO.1t2N) + I(2*OO.1t6N1)+ I(1*OO.1t21N1)+I(1*DOW),
+
+
+
+
+
+    double OO1=vectorSubsetSum(OOs,0,0);
+    double OO1t2=vectorSubsetSum(OOs,0,1);
+    double OO1t6=vectorSubsetSum(OOs,0,5);
+    double OO1t21=vectorSubsetSum(OOs,0,20);
+
+    double  OO1t2N= OO1t2/1.39;
+    double  OO1t6N= OO1t6/2.371653;
+    double  OO1t21N= OO1t21/5;
+
+
+    //cout<<" avgVR= "<<dateMR<<" "<<avgEmaStdRat<<" "<<countMR<<endl;
+
+    if(GAP==NA_DBL 
+       ||OO1==NA_DBL || OO1t2N==NA_DBL || OO1t6N==NA_DBL||OO1t21N==NA_DBL)
+    {
+       cerr<<"Error: One of the OOs contains NA value"<<endl;
+       exit(1);
+    }
+
+
+    int isVX=0;
+    if(as.getSymbol()=="VX")
+    {
+      isVX=1;
+      isPhy=1;
+    }
+
+
+
+    xVec.push_back(isPhy);
+
+
+    if(isVX==0)
+    {
+      xVec.push_back(GAP*2.0);
+      xVec.push_back(OO1*8.0);
+      xVec.push_back(OO1t2N*4.0);
+      xVec.push_back(OO1t6N*2.0);
+      xVec.push_back(OO1t21N*1.0);
+    }
+    else
+    {
+      xVec.push_back(-GAP*2.0);
+      xVec.push_back(-OO1*8.0);
+      xVec.push_back(-OO1t2N*4.0);
+      xVec.push_back(-OO1t6N*2.0);
+      xVec.push_back(-OO1t21N*1.0);
+    }
+
+    xVec.push_back(DOW);
+
+    /*
+    //print   
+    for(unsigned int i=0;i<xVec.size();i++)
+    {
+        cout<<i<<" "<<xVec[i]<<endl;
+    }
+    */
+
+    /*
+    cout<<"20150213="<<getDOW(20150213)<<endl;
+    cout<<"20150306="<<getDOW(20150306)<<endl;
+    cout<<"20000106="<<getDOW(20000106)<<endl;
+    cout<<"20000306="<<getDOW(20000306)<<endl;
+    cout<<"19950306="<<getDOW(19950306)<<endl;
+    */
+
+    return xVec;
+}
+
