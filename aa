@@ -1,0 +1,80 @@
+more /home/jgeng/transfer/Prod/risk_global.conf
+#global risk profile
+RPF           = 14566
+AUM_TARGET    = 1000000
+AUM_NOW       = 4200000
+FCST_CUTOFF_L = -0.025
+FCST_CUTOFF_H = 0.03
+MIN_MULT = 6
+
+
+asset risk adjustment:
+
+more Logs/bySym/trade_log.txt.20190426.*|fgrep Timestamp|mygetcols.pl 5 34:43|myFormatAuto.pl 1|myAssetSession_four_aseets.pl 0 1|myFormatAuto.pl 1 |sort -k14,14
+  CD RPF= 14566 RPFAdj= 8029.51 SYMMult=  0.7 ASSETMULT=  0.7 NUDGEMULT= 1.5  Currency  Europe  Currency
+  EC RPF= 14566 RPFAdj= 11470.7 SYMMult=    1 ASSETMULT=  0.7 NUDGEMULT= 1.5  Currency  Europe  Currency
+  JY RPF= 14566 RPFAdj= 11470.7 SYMMult=    1 ASSETMULT=  0.7 NUDGEMULT= 1.5  Currency America  Currency
+
+ CGB RPF= 14566 RPFAdj= 12781.7 SYMMult=    1 ASSETMULT=  0.9 NUDGEMULT= 1.3 Financial America Financial
+ GBL RPF= 14566 RPFAdj= 12781.7 SYMMult=    1 ASSETMULT=  0.9 NUDGEMULT= 1.3 Financial  Europe Financial
+ GBM RPF= 14566 RPFAdj= 12781.7 SYMMult=    1 ASSETMULT=  0.9 NUDGEMULT= 1.3 Financial  Europe Financial
+ LLG RPF= 14566 RPFAdj= 12781.7 SYMMult=    1 ASSETMULT=  0.9 NUDGEMULT= 1.3 Financial  Europe Financial
+  TY RPF= 14566 RPFAdj= 12781.7 SYMMult=    1 ASSETMULT=  0.9 NUDGEMULT= 1.3 Financial America Financial
+  US RPF= 14566 RPFAdj= 12781.7 SYMMult=    1 ASSETMULT=  0.9 NUDGEMULT= 1.3 Financial America Financial
+
+ DAX RPF= 14566 RPFAdj= 11361.5 SYMMult=    1 ASSETMULT=  0.8 NUDGEMULT= 1.3     Index  Europe     Index
+  ES RPF= 14566 RPFAdj= 11361.5 SYMMult=    1 ASSETMULT=  0.8 NUDGEMULT= 1.3     Index America     Index
+ ESX RPF= 14566 RPFAdj= 11361.5 SYMMult=    1 ASSETMULT=  0.8 NUDGEMULT= 1.3     Index  Europe     Index
+ LFT RPF= 14566 RPFAdj= 11361.5 SYMMult=    1 ASSETMULT=  0.8 NUDGEMULT= 1.3     Index  Europe     Index
+  NQ RPF= 14566 RPFAdj= 11361.5 SYMMult=    1 ASSETMULT=  0.8 NUDGEMULT= 1.3     Index America     Index
+ SNI RPF= 14566 RPFAdj= 11361.5 SYMMult=    1 ASSETMULT=  0.8 NUDGEMULT= 1.3     Index    Asia     Index
+ STW RPF= 14566 RPFAdj= 11361.5 SYMMult=    1 ASSETMULT=  0.8 NUDGEMULT= 1.3     Index    Asia     Index
+  VX RPF= 14566 RPFAdj= 7647.15 SYMMult=  0.7 ASSETMULT=    1 NUDGEMULT=   1     Index America     Index
+
+  BC RPF= 14566 RPFAdj= 14708.7 SYMMult= 0.85 ASSETMULT= 1.32 NUDGEMULT= 1.2    Energy  Europe  Physical
+  CL RPF= 14566 RPFAdj= 14708.7 SYMMult= 0.85 ASSETMULT= 1.32 NUDGEMULT= 1.2    Energy America  Physical
+   C RPF= 14566 RPFAdj= 17304.4 SYMMult=    1 ASSETMULT= 1.32 NUDGEMULT= 1.2     Grain America  Physical
+  CT RPF= 14566 RPFAdj= 17304.4 SYMMult=    1 ASSETMULT= 1.32 NUDGEMULT= 1.2      Soft America  Physical
+  GC RPF= 14566 RPFAdj= 17304.4 SYMMult=    1 ASSETMULT= 1.32 NUDGEMULT= 1.2     Metal America  Physical
+  HG RPF= 14566 RPFAdj= 17304.4 SYMMult=    1 ASSETMULT= 1.32 NUDGEMULT= 1.2     Metal America  Physical
+  KC RPF= 14566 RPFAdj= 12113.1 SYMMult=  0.7 ASSETMULT= 1.32 NUDGEMULT= 1.2      Soft America  Physical
+  LC RPF= 14566 RPFAdj= 17304.4 SYMMult=    1 ASSETMULT= 1.32 NUDGEMULT= 1.2      Meat America  Physical
+  NG RPF= 14566 RPFAdj= 17304.4 SYMMult=    1 ASSETMULT= 1.32 NUDGEMULT= 1.2    Energy America  Physical
+  SB RPF= 14566 RPFAdj= 17304.4 SYMMult=    1 ASSETMULT= 1.32 NUDGEMULT= 1.2      Soft America  Physical
+   W RPF= 14566 RPFAdj= 17304.4 SYMMult=    1 ASSETMULT= 1.32 NUDGEMULT= 1.2     Grain America  Physical
+  ED RPF= 14566 RPFAdj= 10924.5 SYMMult=    1 ASSETMULT=    1 NUDGEMULT=   1       SIR America       SIR
+
+
+2019YTD risk as of Apr 27:
+stock 0.244%
+bond  0.35%
+cur   0.11%
+phy   0.25%
+
+total=0.51% -> annual: 8%.
+
+If we target 1:1:2/3:1, we would have:
+stock 0.28%
+bond  0.28%
+cur   0.19%
+phy   0.28%
+
+For now, I just make phy assetmult to be same as bond, also increase all by x1.06 to compensate overall smaller risk.
+In addition, I reset nedge factor to 1 now.
+So new asset multiplers:
+stock 1.1
+bond  1.24
+curr  1.113
+phy   1.24
+
+
+
+
+
+
+
+
+
+
+
+/roottransfer/jgeng/Prod/fcsts/fcstSum.txt
